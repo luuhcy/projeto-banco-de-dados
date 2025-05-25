@@ -1,0 +1,128 @@
+CREATE TABLE Departamento(
+	cod_dep CHAR(5) PRIMARY KEY,
+	email VARCHAR(100),
+	telefone VARCHAR(20),
+	coordenador VARCHAR(100),
+	nome VARCHAR(50)
+);
+
+CREATE TABLE Aluno(
+	matricula CHAR(9) PRIMARY KEY,
+	genero VARCHAR(10) NOT NULL,
+	cep CHAR(8) NOT NULL,
+	nome VARCHAR(50),
+	email VARCHAR(100),
+	telefone VARCHAR(20),
+	curso VARCHAR(20),
+	cod_dep CHAR(5),
+	FOREIGN KEY (cod_dep) REFERENCES Departamento(cod_dep)
+);
+
+CREATE TABLE Motorista (
+	cod_motorista INT PRIMARY KEY,
+	cnh VARCHAR(11),
+	matricula CHAR(9),
+	FOREIGN KEY (matricula) REFERENCES Aluno(matricula)
+);
+
+CREATE TABLE Veiculo (
+	placa VARCHAR(7) PRIMARY KEY,
+	modelo VARCHAR(20),
+	cor VARCHAR(10),
+	cod_motorista INT,
+	FOREIGN KEY (cod_motorista) REFERENCES Motorista(cod_motorista)
+);
+
+CREATE TABLE Notificacao(
+	cod_notificacao INT PRIMARY KEY,
+	mensagem TEXT NOT NULL,
+	tipo_notificacao VARCHAR(20),
+	data_envio DATE
+);
+
+CREATE TABLE aluno_Notificacao(
+	matricula CHAR(9),
+	cod_notificacao INT,
+	PRIMARY KEY(matricula, cod_notificacao),
+	FOREIGN KEY (matricula) REFERENCES Aluno(matricula),
+	FOREIGN KEY (cod_notificacao) REFERENCES Notificacao(cod_notificacao)
+);
+
+CREATE TABLE Feedback(
+	cod_notificacao INT PRIMARY KEY,
+	nota INT,
+	comentario TEXT,
+	data_avaliacao DATE,
+	FOREIGN KEY (cod_notificacao) REFERENCES Notificacao(cod_notificacao)
+);
+
+CREATE TABLE Passageiro(
+	cod_passageiro INT PRIMARY KEY,
+	matricula CHAR(9),
+	FOREIGN KEY (matricula) REFERENCES Aluno(matricula)
+);
+
+CREATE TABLE Feedback_Passageiro(
+	cod_notificacao INT,
+	cod_passageiro INT,
+	PRIMARY KEY (cod_notificacao, cod_passageiro),
+	FOREIGN KEY (cod_notificacao) REFERENCES Feedback(cod_notificacao),
+	FOREIGN KEY (cod_passageiro) REFERENCES Passageiro(cod_passageiro)
+);
+
+CREATE TABLE Carona (
+	cod_carona INT PRIMARY KEY,
+	cod_confirmacao VARCHAR(20),
+	data_agendamento DATE,
+	tipo_carona VARCHAR(50),
+	cod_motorista INT,
+	FOREIGN KEY (cod_motorista) REFERENCES Motorista(cod_motorista)
+);
+
+CREATE TABLE carona_Passageiro (
+	cod_carona INT,
+	cod_passageiro INT,
+	PRIMARY KEY (cod_carona, cod_passageiro),
+	FOREIGN KEY (cod_carona) REFERENCES Carona(cod_carona),
+	FOREIGN KEY (cod_passageiro) REFERENCES Passageiro(cod_passageiro)
+);
+
+CREATE TABLE carona_Feedback (
+	cod_notificacao INT,
+	cod_carona INT,
+	PRIMARY KEY (cod_notificacao, cod_carona),
+	FOREIGN KEY (cod_notificacao) REFERENCES Feedback(cod_notificacao),
+	FOREIGN KEY (cod_carona) REFERENCES Carona(cod_carona)
+);
+
+CREATE TABLE Local (
+	cep VARCHAR(10) PRIMARY KEY,
+	ponto_referencia VARCHAR(100),
+	origem VARCHAR(100),
+	destino VARCHAR(100),
+	hora_partida TIME,
+	hora_chegada TIME
+);
+
+CREATE TABLE local_Carona (
+	cep VARCHAR(10),
+	cod_carona INT,
+	parada VARCHAR(100),
+	PRIMARY KEY (cep, cod_carona),
+	FOREIGN KEY (cep) REFERENCES Local(cep),
+	FOREIGN KEY (cod_carona) REFERENCES Carona(cod_carona)
+);
+
+CREATE TABLE Ajuda_de_Custo (
+	cod_transacao INT PRIMARY KEY,
+	valor DECIMAL(10, 2),
+	forma_de_pagamento VARCHAR(50)
+);
+
+CREATE TABLE carona_Ajuda (
+	cod_transacao INT,
+	cod_carona INT,
+	PRIMARY KEY (cod_transacao, cod_carona),
+	FOREIGN KEY (cod_transacao) REFERENCES Ajuda_de_Custo(cod_transacao),
+	FOREIGN KEY (cod_carona) REFERENCES Carona(cod_carona)
+);
